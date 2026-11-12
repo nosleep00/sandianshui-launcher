@@ -58,8 +58,10 @@ public sealed class JavaRuntimeServiceTests : IDisposable
             Size: zip.Length,
             Version: "17.0.21+9"));
         var service = CreateService(HttpStatusCode.OK, [unavailable, mirror], zip);
+        var reported = new List<JavaRuntimeProgress>();
+        var progress = new SynchronousProgress(reported);
 
-        JavaInfo info = await service.EnsureAsync(17, _dataDir);
+        JavaInfo info = await service.EnsureAsync(17, _dataDir, progress);
 
         Assert.Equal(17, info.MajorVersion);
         Assert.Equal("17.0.21", info.Version);
@@ -67,6 +69,7 @@ public sealed class JavaRuntimeServiceTests : IDisposable
             _dataDir, "java", "temurin-17", "jdk-17.0.21+9-jre", "bin", "java.exe")));
         Assert.Equal(1, unavailable.Calls);
         Assert.Equal(1, mirror.Calls);
+        Assert.Contains(reported, p => p.Message.Contains("正在从 清华镜像 查找", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -286,5 +289,11 @@ public sealed class JavaRuntimeServiceTests : IDisposable
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
             => Task.FromResult(respond(request));
+    }
+
+    /// <summary>同步收集进度报告（Progress&lt;T&gt; 会异步投递，测试里不好断言）。</summary>
+    private sealed class SynchronousProgress(List<JavaRuntimeProgress> sink) : IProgress<JavaRuntimeProgress>
+    {
+        public void Report(JavaRuntimeProgress value) => sink.Add(value);
     }
 }

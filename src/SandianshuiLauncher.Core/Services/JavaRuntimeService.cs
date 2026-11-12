@@ -243,7 +243,8 @@ public class JavaRuntimeService : IJavaRuntimeService
         {
             cancellationToken.ThrowIfCancellationRequested();
             onStatus?.Invoke($"正在从{source.DisplayName}查找 Java {majorVersion}…");
-            progress?.Report(new JavaRuntimeProgress("查找下载地址", 2, source.DisplayName));
+            progress?.Report(new JavaRuntimeProgress(
+                "查找下载地址", 2, $"正在从 {source.DisplayName} 查找 Java {majorVersion}…"));
 
             JavaRuntimePackage? package;
             try
