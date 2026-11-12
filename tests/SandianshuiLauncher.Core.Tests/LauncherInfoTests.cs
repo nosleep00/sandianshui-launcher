@@ -5,9 +5,9 @@ namespace SandianshuiLauncher.Core.Tests;
 public class LauncherInfoTests
 {
     [Fact]
-    public void Version_IsOnePointZero()
+    public void Version_IsOnePointOne()
     {
-        Assert.Equal("1.0.0", LauncherInfo.Version);
+        Assert.Equal("1.1.0", LauncherInfo.Version);
     }
 
     [Fact]

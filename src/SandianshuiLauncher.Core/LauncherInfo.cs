@@ -8,10 +8,10 @@ namespace SandianshuiLauncher.Core;
 public static class LauncherInfo
 {
     /// <summary>语义化版本号。</summary>
-    public const string Version = "1.0.0";
+    public const string Version = "1.1.0";
 
     /// <summary>界面上显示的版本号。</summary>
-    public const string DisplayVersion = "v1.0.0";
+    public const string DisplayVersion = "v1.1.0";
 
     /// <summary>启动器名称。</summary>
     public const string Name = "三点水启动器";

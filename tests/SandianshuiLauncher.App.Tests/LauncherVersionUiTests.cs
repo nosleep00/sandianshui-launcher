@@ -46,9 +46,9 @@ public class LauncherVersionUiTests
     }
 
     [Fact]
-    public void LauncherInfo_VersionIsOnePointZero()
+    public void LauncherInfo_VersionIsOnePointOne()
     {
-        Assert.Equal("1.0.0", LauncherInfo.Version);
-        Assert.Equal("v1.0.0", LauncherInfo.DisplayVersion);
+        Assert.Equal("1.1.0", LauncherInfo.Version);
+        Assert.Equal("v1.1.0", LauncherInfo.DisplayVersion);
     }
 }

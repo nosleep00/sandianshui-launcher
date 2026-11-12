@@ -64,7 +64,7 @@
 
 | 产物 | 说明 |
 | --- | --- |
-| `SandianshuiLauncher-1.0.0-win-x64.zip` | 便携版，解压即用。**已自带 .NET 运行时**，无需另装 |
+| `SandianshuiLauncher-1.1.0-win-x64.zip` | 便携版，解压即用。**已自带 .NET 运行时**，无需另装 |
 
 解压后双击 `SandianshuiLauncher.exe` 即可；配置、账号、日志都写在 `%AppData%\SandianshuiLauncher`，删除该目录即可恢复出厂状态。
 
