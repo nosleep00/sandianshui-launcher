@@ -2,11 +2,11 @@
 
 一款面向 Windows 的 Minecraft Java 版第三方启动器，使用 **.NET 10 + WPF** 从零实现，界面与交互参考 [PCL2](https://github.com/PCL-Community/PCL2-CE) 的使用习惯，**不包含其任何代码副本**。
 
-[![CI](https://github.com/USERNAME/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/nosleep00/andianshui-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/nosleep00/andianshui-launcher/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
 
-> 仓库地址中的 `USERNAME/REPO` 请在首次推送后替换为你自己的 GitHub 仓库路径。
+> 如果你 fork 了本项目，请把上面的徽章地址换成的你的仓库路径。
 
 ## 功能特性
 
