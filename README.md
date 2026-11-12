@@ -2,7 +2,7 @@
 
 一款面向 Windows 的 Minecraft Java 版第三方启动器，使用 **.NET 10 + WPF** 从零实现，界面与交互参考 [PCL2](https://github.com/PCL-Community/PCL2-CE) 的使用习惯，**不包含其任何代码副本**。
 
-[![CI](https://github.com/nosleep00/andianshui-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/nosleep00/andianshui-launcher/actions/workflows/ci.yml)
+[![CI](https://github.com/nosleep00/sandianshui-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/nosleep00/sandianshui-launcher/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
 
@@ -59,7 +59,7 @@
 
 ## 下载
 
-不想自己编译的话，直接到 [Releases](https://github.com/nosleep00/andianshui-launcher/releases) 下载：
+不想自己编译的话，直接到 [Releases](https://github.com/nosleep00/sandianshui-launcher/releases) 下载：
 
 | 产物 | 说明 |
 | --- | --- |
