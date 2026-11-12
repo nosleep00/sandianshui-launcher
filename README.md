@@ -57,10 +57,20 @@
 | --- | --- |
 | ![模组管理](docs/images/mods.png) | ![设置](docs/images/settings.png) |
 
+## 下载
+
+不想自己编译的话，直接到 [Releases](https://github.com/nosleep00/andianshui-launcher/releases) 下载：
+
+| 产物 | 说明 |
+| --- | --- |
+| `SandianshuiLauncher-1.0.0-win-x64.zip` | 便携版，解压即用。**已自带 .NET 运行时**，无需另装 |
+
+解压后双击 `SandianshuiLauncher.exe` 即可；配置、账号、日志都写在 `%AppData%\SandianshuiLauncher`，删除该目录即可恢复出厂状态。
+
 ## 系统要求
 
 - Windows 10 1809 及以上 / Windows 11（x64）
-- 运行：.NET 10 Desktop Runtime（或使用自包含发布产物）
+- 运行：.NET 10 Desktop Runtime（或使用上面自带运行时的便携版）
 - 构建：.NET 10 SDK，版本由 [global.json](global.json) 固定（当前 `10.0.403`）
 - 游戏本体需自备正版账号（本启动器不提供游戏文件与账号）
 
