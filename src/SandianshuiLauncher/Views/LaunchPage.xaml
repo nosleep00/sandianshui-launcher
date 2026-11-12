@@ -1,0 +1,287 @@
+<UserControl x:Class="SandianshuiLauncher.Views.LaunchPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:converters="clr-namespace:SandianshuiLauncher.Converters"
+             d:DataContext="{d:DesignInstance Type=ViewModels:LaunchViewModel}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ViewModels="clr-namespace:SandianshuiLauncher.ViewModels"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:FirstCharConverter x:Key="FirstChar" />
+
+        <!-- 首页循环动画：外环扫光顺时针旋转、内环反向缓转、三个光点绕行、中心光晕呼吸。 -->
+        <Storyboard x:Key="LauncherIdleAnimation">
+            <DoubleAnimation Storyboard.TargetName="SpinArc"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                             From="0" To="360" Duration="0:0:2.6" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="CounterArc"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                             From="360" To="0" Duration="0:0:7" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="DotRing"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                             From="0" To="360" Duration="0:0:11" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="Glow"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                             From="0.92" To="1.06" Duration="0:0:1.9" AutoReverse="True" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="Glow"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                             From="0.92" To="1.06" Duration="0:0:1.9" AutoReverse="True" RepeatBehavior="Forever" />
+            <DoubleAnimation Storyboard.TargetName="Glow"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.08" To="0.22" Duration="0:0:1.9" AutoReverse="True" RepeatBehavior="Forever" />
+        </Storyboard>
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource LauncherIdleAnimation}" />
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="启动游戏"
+                   Style="{StaticResource PageTitle}"
+                   Margin="0,0,0,18" />
+
+        <!-- 账号卡片 -->
+        <Border Style="{StaticResource CardSurface}" Grid.Row="1" Padding="18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Border Width="52"
+                        Height="52"
+                        CornerRadius="26"
+                        Background="{DynamicResource AccentFillColorDefaultBrush}">
+                    <TextBlock Text="{Binding AccountName, Converter={StaticResource FirstChar}}"
+                               FontSize="24"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding AccountName}" FontSize="17" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding AccountTypeText}" FontSize="12" Opacity="0.6" Margin="0,2,0,0" />
+                </StackPanel>
+
+                <ui:Button Grid.Column="2"
+                           Content="添加 / 切换账号"
+                           VerticalAlignment="Center"
+                           Command="{Binding AddAccountCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- 版本选择与启动 -->
+        <Border Style="{StaticResource CardSurface}" Grid.Row="2" Padding="18" Margin="0,14,0,0">
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="游戏版本"
+                               VerticalAlignment="Center"
+                               Margin="0,0,14,0"
+                               Opacity="0.7" />
+                    <ComboBox Grid.Column="1"
+                              Height="34"
+                              ItemsSource="{Binding LocalVersions}"
+                              SelectedItem="{Binding SelectedVersion}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Id}"
+                                               VerticalAlignment="Center" />
+                                    <Border CornerRadius="6"
+                                            Padding="6,1"
+                                            Margin="8,0,0,0"
+                                            Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                            Visibility="{Binding LoaderName, Converter={StaticResource NullToCollapsed}}">
+                                        <TextBlock Text="{Binding LoaderName}"
+                                                   FontSize="10"
+                                                   Opacity="0.75"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ui:Button Grid.Column="2"
+                               Content="版本设置"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center"
+                               Command="{Binding OpenVersionSettingsCommand}"
+                               ToolTip="为该版本单独设置内存、Java 与 JVM 参数（不影响其他版本）" />
+                </Grid>
+
+                <ui:Button Height="48"
+                           HorizontalAlignment="Stretch"
+                           Appearance="Primary"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           Command="{Binding LaunchCommand}"
+                           Content="▶ 启动游戏" />
+            </StackPanel>
+        </Border>
+
+        <!-- 循环动画 + 启动进度 -->
+        <Border Style="{StaticResource CardSurface}" Grid.Row="3" Padding="18" Margin="0,14,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- 188x188 的环形动画；窗口再矮时等比缩小，不会被裁掉。 -->
+                <Viewbox Grid.Row="0"
+                         Margin="0,2,0,14"
+                         Stretch="Uniform"
+                         StretchDirection="DownOnly">
+                    <Grid Width="188" Height="188">
+                        <!-- 中心呼吸光晕 + 启动器图标 -->
+                        <Ellipse x:Name="Glow"
+                                 Width="104"
+                                 Height="104"
+                                 StrokeThickness="8"
+                                 Stroke="{DynamicResource AccentFillColorDefaultBrush}"
+                                 Opacity="0.12"
+                                 RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <Grid Width="54" Height="54">
+                            <Image Source="pack://application:,,,/assets/app.ico"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.Clip>
+                                    <EllipseGeometry Center="27,27" RadiusX="27" RadiusY="27" />
+                                </Image.Clip>
+                            </Image>
+                        </Grid>
+
+                        <!-- 静止轨道 -->
+                        <Ellipse Width="148"
+                                 Height="148"
+                                 StrokeThickness="4"
+                                 Opacity="0.28"
+                                 Stroke="{DynamicResource SubtleFillColorSecondaryBrush}" />
+
+                        <!-- 主扫光弧（顺时针，带圆头） -->
+                        <Path x:Name="SpinArc"
+                              Width="188"
+                              Height="188"
+                              Stretch="None"
+                              StrokeThickness="5"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Stroke="{DynamicResource AccentFillColorDefaultBrush}"
+                              RenderTransformOrigin="0.5,0.5"
+                              Data="M 94,20 A 74,74 0 0 1 166.87,106.85">
+                            <Path.RenderTransform>
+                                <RotateTransform />
+                            </Path.RenderTransform>
+                        </Path>
+
+                        <!-- 内侧反向缓转的短弧 -->
+                        <Path x:Name="CounterArc"
+                              Width="188"
+                              Height="188"
+                              Stretch="None"
+                              StrokeThickness="3"
+                              Opacity="0.35"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Stroke="{DynamicResource AccentFillColorDefaultBrush}"
+                              RenderTransformOrigin="0.5,0.5"
+                              Data="M 94,40 A 54,54 0 0 1 138.2,63">
+                            <Path.RenderTransform>
+                                <RotateTransform />
+                            </Path.RenderTransform>
+                        </Path>
+
+                        <!-- 三个光点绕行（呼应“三点水”） -->
+                        <Canvas x:Name="DotRing"
+                                Width="188"
+                                Height="188"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Canvas.RenderTransform>
+                                <RotateTransform />
+                            </Canvas.RenderTransform>
+                            <Ellipse Width="7"
+                                     Height="7"
+                                     Canvas.Left="90.5"
+                                     Canvas.Top="24.5"
+                                     Opacity="0.75"
+                                     Fill="{DynamicResource AccentFillColorDefaultBrush}" />
+                            <Ellipse Width="5"
+                                     Height="5"
+                                     Canvas.Left="148.7"
+                                     Canvas.Top="124.5"
+                                     Opacity="0.5"
+                                     Fill="{DynamicResource AccentFillColorDefaultBrush}" />
+                            <Ellipse Width="4"
+                                     Height="4"
+                                     Canvas.Left="34.8"
+                                     Canvas.Top="125"
+                                     Opacity="0.35"
+                                     Fill="{DynamicResource AccentFillColorDefaultBrush}" />
+                        </Canvas>
+                    </Grid>
+                </Viewbox>
+
+                <!-- 启动进度 -->
+                <StackPanel Grid.Row="1">
+                    <Grid>
+                        <TextBlock Text="{Binding StatusText}"
+                                   FontSize="13"
+                                   Opacity="0.75"
+                                   VerticalAlignment="Center" />
+                        <TextBlock x:Name="ProgressText"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   Opacity="0.55"
+                                   Text="{Binding LaunchProgress, StringFormat={}{0:0}%}" />
+                    </Grid>
+
+                    <ProgressBar x:Name="LaunchBar"
+                                 Height="6"
+                                 Margin="0,8,0,0"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Value="{Binding LaunchProgress, Mode=OneWay}">
+                        <ProgressBar.Template>
+                            <ControlTemplate TargetType="ProgressBar">
+                                <Grid>
+                                    <Border x:Name="PART_Track"
+                                            CornerRadius="3"
+                                            Background="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                                    <Border x:Name="PART_Indicator"
+                                            HorizontalAlignment="Left"
+                                            CornerRadius="3"
+                                            Background="{DynamicResource AccentFillColorDefaultBrush}" />
+                                </Grid>
+                            </ControlTemplate>
+                        </ProgressBar.Template>
+                    </ProgressBar>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

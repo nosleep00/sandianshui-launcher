@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  build-test:
+    name: 构建与测试（Windows）
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 .NET SDK（按 global.json）
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: 还原依赖
+        run: dotnet restore SandianshuiLauncher.slnx
+
+      - name: 运行全部单元测试（Release）
+        run: dotnet test SandianshuiLauncher.slnx -c Release --no-restore
+
+      - name: Release 构建
+        run: dotnet build SandianshuiLauncher.slnx -c Release --no-restore

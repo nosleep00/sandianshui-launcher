@@ -1,0 +1,230 @@
+<UserControl x:Class="SandianshuiLauncher.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ViewModels="clr-namespace:SandianshuiLauncher.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=ViewModels:SettingsViewModel}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,24">
+        <StackPanel>
+
+            <TextBlock Text="设置"
+                       Style="{StaticResource PageTitle}"
+                       Margin="0,0,0,18" />
+
+            <!-- 目录 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="游戏目录" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="34"
+                                 Text="{Binding GameDirectory}"
+                                 VerticalContentAlignment="Center" />
+                        <ui:Button Grid.Column="1"
+                                   Content="浏览…"
+                                   Margin="10,0,0,0"
+                                   Command="{Binding BrowseGameDirectoryCommand}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Java -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Java 运行环境" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="34"
+                                 Text="{Binding JavaPath}"
+                                 VerticalContentAlignment="Center"
+                                 ToolTip="留空则启动时自动检测匹配版本" />
+                        <ui:Button Grid.Column="1"
+                                   Content="浏览…"
+                                   Margin="10,0,0,0"
+                                   Command="{Binding BrowseJavaCommand}" />
+                        <ui:Button Grid.Column="2"
+                                   Content="自动检测"
+                                   Margin="10,0,0,0"
+                                   IsEnabled="{Binding IsDetectingJava, Converter={StaticResource InverseBool}}"
+                                   Command="{Binding DetectJavaCommand}" />
+                    </Grid>
+                    <TextBox Text="{Binding DetectedJavaText, Mode=OneWay}"
+                             Margin="0,10,0,0"
+                             IsReadOnly="True"
+                             BorderThickness="0"
+                             FontSize="11"
+                             FontFamily="Consolas,Microsoft YaHei UI"
+                             MaxHeight="120"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" />
+                </StackPanel>
+            </Border>
+
+            <!-- 内存 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="最大内存（MB）" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock HorizontalAlignment="Right"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding MaxMemoryMb, StringFormat='{}{0} MB'}" />
+                    </Grid>
+                    <Slider Margin="0,10,0,0"
+                            Minimum="1024"
+                            Maximum="16384"
+                            TickFrequency="256"
+                            IsSnapToTickEnabled="True"
+                            Value="{Binding MaxMemoryMb}" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="11"
+                               Opacity="0.55"
+                               Text="{Binding RecommendedMemory, StringFormat='建议值：{0} MB（约为物理内存的四分之一）'}" />
+                    <TextBlock Text="最小内存（MB）" FontSize="13" Margin="0,12,0,4" />
+                    <TextBox Height="32" Text="{Binding MinMemoryMb}" />
+                </StackPanel>
+            </Border>
+
+            <!-- 下载源 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="下载源" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ComboBox Height="34"
+                              SelectedValuePath="Tag"
+                              SelectedValue="{Binding DownloadSourceId}">
+                        <ComboBoxItem Content="MC 光速镜像（推荐·国内加速）" Tag="guangsu" />
+                        <ComboBoxItem Content="Mojang 官方源（国内可能较慢）" Tag="mojang" />
+                        <ComboBoxItem Content="BMCLAPI 公益源（BMCLAPI 兼容）" Tag="bmclapi" />
+                        <ComboBoxItem Content="自定义镜像（BMCLAPI 兼容规则）" Tag="custom" />
+                    </ComboBox>
+                    <StackPanel Margin="0,10,0,0">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DownloadSourceId}" Value="custom">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="镜像基础地址（末尾不带斜杠，例如 https://your-mirror.example.com）"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   Margin="0,0,0,4" />
+                        <TextBox Height="34"
+                                 Text="{Binding CustomMirrorBaseUrl}" />
+                    </StackPanel>
+                    <TextBlock Text="下载线程数" FontSize="13" Margin="0,12,0,4" />
+                    <TextBox Height="32" Text="{Binding DownloadThreads}" />
+                </StackPanel>
+            </Border>
+
+            <!-- 模组镜像 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="模组下载（MCIM 镜像）" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ui:ToggleSwitch Content="使用 MCIM 国内镜像加速模组搜索与下载（关闭则直连 Modrinth 官方）"
+                                     IsChecked="{Binding ModUseMirror}"
+                                     Margin="0,4" />
+                    <TextBlock Text="模组请求 User-Agent" FontSize="12" Margin="0,12,0,4" Opacity="0.7" />
+                    <TextBox Height="34"
+                             Text="{Binding ModUserAgent}"
+                             VerticalContentAlignment="Center" />
+                    <TextBlock Text="MCIM 可能启用 UA 白名单，需向 MCIM 项目提交该 UA 报备；不清楚可保持默认值。"
+                               FontSize="11"
+                               Opacity="0.55"
+                               Margin="0,6,0,0"
+                               TextWrapping="Wrap" />
+                    <TextBlock Text="CurseForge API Key（选填）" FontSize="12" Margin="0,12,0,4" Opacity="0.7" />
+                    <TextBox Height="34"
+                             Text="{Binding CurseForgeApiKey}"
+                             VerticalContentAlignment="Center" />
+                    <TextBlock Text="用于导入 CurseForge 整合包时自动下载模组（https://console.curseforge.com 申请）；留空则导入时仅应用配置并生成缺失模组清单。"
+                               FontSize="11"
+                               Opacity="0.55"
+                               Margin="0,6,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <!-- 游戏运行 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="游戏运行" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ui:ToggleSwitch Content="版本隔离（每个版本独立存档、Mod、截图）"
+                                     IsChecked="{Binding VersionIsolation}"
+                                     Margin="0,4" />
+                    <ui:ToggleSwitch Content="全屏启动"
+                                     IsChecked="{Binding Fullscreen}"
+                                     Margin="0,4" />
+                    <ui:ToggleSwitch Content="启动游戏后自动最小化启动器（检测到游戏窗口时）"
+                                     IsChecked="{Binding MinimizeOnLaunch}"
+                                     Margin="0,4" />
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="窗口宽度（0 为默认）" FontSize="12" Opacity="0.7" />
+                            <TextBox Height="32" Text="{Binding WindowWidth}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="窗口高度（0 为默认）" FontSize="12" Opacity="0.7" />
+                            <TextBox Height="32" Text="{Binding WindowHeight}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="额外 JVM 参数" FontSize="12" Margin="0,12,0,4" Opacity="0.7" />
+                    <TextBox Height="32"
+                             Text="{Binding ExtraJvmArgs}"
+                             ToolTip="例如 -Dfile.encoding=UTF-8，不懂可留空" />
+                </StackPanel>
+            </Border>
+
+            <!-- 个性化 -->
+            <Border Style="{StaticResource CardSurface}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="个性化" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ui:ToggleSwitch Content="深色模式（关闭为浅色）"
+                                     IsChecked="{Binding IsDarkTheme}"
+                                     Margin="0,4" />
+                </StackPanel>
+            </Border>
+
+            <!-- 操作 -->
+            <Grid Margin="0,4,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:Button Content="保存设置"
+                           Appearance="Primary"
+                           Width="140"
+                           Height="38"
+                           Command="{Binding SaveCommand}" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Margin="14,0,0,0"
+                           FontSize="12"
+                           Opacity="0.6" />
+                <ui:Button Grid.Column="2"
+                           Content="打开启动器数据目录"
+                           Command="{Binding OpenDataDirectoryCommand}" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

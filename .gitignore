@@ -1,0 +1,64 @@
+# 三点水启动器 .gitignore（.NET / WPF）
+
+# ---- 构建产物 ----
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+publish/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# ---- Visual Studio / Rider / VSCode ----
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.swp
+*.lock.json
+
+# ---- NuGet ----
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.fragment.lock.json
+
+# ---- .NET Core / test 结果 ----
+project.assets.json
+*.nuget.props
+*.nuget.targets
+[Tt]est[Rr]esult*/
+TestResults/
+coverage/
+*.coverage
+*.trx
+
+# ---- 发布/打包 ----
+*.exe
+*.dll
+*.pdb
+*.cache
+!**/Resources/**/*.dll
+
+# ---- 临时/调试文件 ----
+*.tmp
+*.log
+window-capture.png
+screenshot-*.png
+
+# ---- 系统/编辑器杂项 ----
+.DS_Store
+Thumbs.db
+desktop.ini

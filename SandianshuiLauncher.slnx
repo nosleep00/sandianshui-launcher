@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SandianshuiLauncher.Core/SandianshuiLauncher.Core.csproj" />
+    <Project Path="src/SandianshuiLauncher/SandianshuiLauncher.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SandianshuiLauncher.Core.Tests/SandianshuiLauncher.Core.Tests.csproj" />
+    <Project Path="tests/SandianshuiLauncher.App.Tests/SandianshuiLauncher.App.Tests.csproj" />
+  </Folder>
+</Solution>
