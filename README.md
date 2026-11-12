@@ -14,7 +14,8 @@
 
 - 在线安装任意正式版 / 快照 / 旧版本，多源自动回退（镜像 → BMCLAPI → Mojang 官方）
 - 完整的版本继承（`inheritsFrom`）合并、新旧 natives 布局处理、游戏参数规则（`rules`）求值
-- Java 自动检测与版本匹配，按版本单独覆盖内存、窗口大小、JVM 参数（版本隔离）
+- Java 自动检测与版本匹配；本机缺少对应 Java 时可按提示自动下载（Adoptium 官方 → 清华镜像），也可在设置页一键安装
+- 按版本单独覆盖内存、窗口大小、JVM 参数（版本隔离）
 - 启动进度反馈、游戏进程监控、退出后自动收起启动器
 
 **加载器**
@@ -100,7 +101,8 @@ dotnet publish src/SandianshuiLauncher/SandianshuiLauncher.csproj -c Release `
 ## 首次使用
 
 1. 打开「设置」，确认**游戏目录**（默认 `%AppData%\.minecraft`，可改为任意目录）。
-2. 「设置 → Java 运行环境」一般可保持自动检测；如检测失败，手动选择 `javaw.exe`。
+2. 「设置 → Java 运行环境」一般可保持自动检测；如检测失败，手动选择 `javaw.exe`，
+   或点「下载 Java」让启动器自行下载一个 JRE（安装到 `%AppData%\SandianshuiLauncher\java\`，不污染系统）。
 3. 打开「账号」→ 添加离线账号并填写用户名（也可先留空，启动前再补）。
 4. 打开「下载游戏」获取版本列表并安装；或把整合包 / 模组文件直接拖入窗口。
 5. （可选）在「设置 → 模组下载」中填写 CurseForge API Key，用于自动下载 CurseForge 整合包内的模组：
