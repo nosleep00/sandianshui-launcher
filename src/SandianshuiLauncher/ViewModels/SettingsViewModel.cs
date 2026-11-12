@@ -2,6 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using SandianshuiLauncher.Core.Models;
 using SandianshuiLauncher.Core.Services;
 using SandianshuiLauncher.Services;
 
@@ -12,6 +13,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly ConfigService _config;
     private readonly JavaDetector _javaDetector;
+    private readonly IJavaRuntimeService _javaRuntime;
     private readonly DownloadSourceProvider _sourceProvider;
     private readonly IDialogService _dialogs;
 
@@ -40,11 +42,13 @@ public partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(
         ConfigService config,
         JavaDetector javaDetector,
+        IJavaRuntimeService javaRuntime,
         DownloadSourceProvider sourceProvider,
         IDialogService dialogs)
     {
         _config = config;
         _javaDetector = javaDetector;
+        _javaRuntime = javaRuntime;
         _sourceProvider = sourceProvider;
         _dialogs = dialogs;
         LoadFromConfig();
@@ -133,6 +137,57 @@ public partial class SettingsViewModel : ObservableObject
         finally
         {
             IsDetectingJava = false;
+        }
+    }
+
+    [ObservableProperty] private bool _isDownloadingJava;
+
+    [ObservableProperty] private string _javaDownloadStatus = string.Empty;
+
+    /// <summary>可一键下载的 Java 大版本（Adoptium Temurin JRE）。</summary>
+    public IReadOnlyList<int> JavaDownloadVersions { get; } = [17, 21];
+
+    [ObservableProperty] private int _selectedJavaDownloadVersion = 17;
+
+    /// <summary>
+    /// 下载并安装一个 JRE 到启动器数据目录，装好后直接选用它（免去用户自己去装 Java）。
+    /// </summary>
+    [RelayCommand]
+    private async Task DownloadJavaAsync()
+    {
+        if (IsDownloadingJava)
+        {
+            return;
+        }
+
+        IsDownloadingJava = true;
+        int major = SelectedJavaDownloadVersion;
+        JavaDownloadStatus = $"正在准备下载 Java {major}…";
+        try
+        {
+            var progress = new Progress<JavaRuntimeProgress>(p =>
+                JavaDownloadStatus = $"{p.Message}（{p.PercentText}）");
+            JavaInfo info = await _javaRuntime.EnsureAsync(
+                major,
+                _config.DataDirectory,
+                progress);
+
+            JavaPath = info.Path;
+            DetectedJavaText =
+                $"Java {info.MajorVersion}（{info.Version}）{(info.Is64Bit ? "64位" : "32位")}\n  {info.Path}";
+            JavaDownloadStatus = $"Java {info.MajorVersion} 已就绪，已填入上方路径";
+            _dialogs.Info(
+                $"Java {info.MajorVersion} 已下载完成，并已选为启动时使用的运行时。\n{info.Path}",
+                "下载完成");
+        }
+        catch (Exception ex)
+        {
+            JavaDownloadStatus = "下载失败";
+            _dialogs.Error($"下载 Java 失败：{ex.Message}", "下载失败");
+        }
+        finally
+        {
+            IsDownloadingJava = false;
         }
     }
 

@@ -49,7 +49,7 @@ internal sealed class TestServices : IDisposable
         HttpClient http, ConfigService config, DownloadService downloads, IDialogService dialogs)
         => new(config, new ModpackService(http, downloads), CreateInstanceService(http, config, downloads), dialogs);
 
-    public TestServices()
+    public TestServices(JavaDetector? javaDetectorOverride = null, IJavaRuntimeService? javaRuntimeOverride = null)
     {
         Root = Path.Combine(Path.GetTempPath(), "sdsl_app_tests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(Root);
@@ -65,7 +65,8 @@ internal sealed class TestServices : IDisposable
         var gameInstaller = new GameInstaller(http, sourceProvider, downloads, downloadQueue);
         var versionService = new VersionService(http, sourceProvider);
         var modLoaderService = new ModLoaderService(http, sourceProvider, downloads, gameInstaller);
-        var javaDetector = new JavaDetector();
+        var javaDetector = javaDetectorOverride ?? new JavaDetector();
+        var javaRuntime = javaRuntimeOverride ?? new JavaRuntimeService(http);
         var launchService = new LaunchService();
         var accountService = new AccountService(Config);
         Accounts = accountService;
@@ -81,12 +82,12 @@ internal sealed class TestServices : IDisposable
         Dialogs = new FakeDialogService();
         var packImport = new PackImportService(Config, modpackService, instanceService, Dialogs);
 
-        Launch = new LaunchViewModel(accountService, Config, gameInstaller, javaDetector, launchService, authlibService, logger, crashFixer, Dialogs);
+        Launch = new LaunchViewModel(accountService, Config, gameInstaller, javaDetector, javaRuntime, launchService, authlibService, logger, crashFixer, Dialogs);
         Loader = new LoaderViewModel(Config, modLoaderService, javaDetector, Dialogs);
         Download = new DownloadViewModel(Config, versionService, gameInstaller, sourceProvider, downloadQueue, Loader, Dialogs);
         Mods = new ModsViewModel(Config, modService, curseForgeService, groupService, directoryPack, packImport, Dialogs);
         Versions = new VersionsViewModel(Config, modpackService, directoryPack, packImport, Dialogs);
-        Settings = new SettingsViewModel(Config, javaDetector, sourceProvider, Dialogs);
+        Settings = new SettingsViewModel(Config, javaDetector, javaRuntime, sourceProvider, Dialogs);
         Main = new MainViewModel(Launch, Download, Mods, Versions, Settings, Config, Dialogs);
     }
 

@@ -12,6 +12,13 @@ public static class HashUtils
         return Convert.ToHexString(SHA1.HashData(stream)).ToLowerInvariant();
     }
 
+    /// <summary>计算文件的 SHA256（小写十六进制），用于校验官方渠道提供的 Java 安装包。</summary>
+    public static string Sha256File(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+    }
+
     /// <summary>
     /// 校验文件 SHA1；文件不存在或不匹配时返回 false。
     /// </summary>

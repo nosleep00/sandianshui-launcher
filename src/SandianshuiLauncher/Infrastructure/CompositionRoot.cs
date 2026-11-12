@@ -43,8 +43,19 @@ public static class CompositionRoot
         services.AddSingleton(sp => new DownloadQueue(sp.GetRequiredService<ConfigService>().DataDirectory));
         services.AddSingleton<VersionService>();
         services.AddSingleton<GameInstaller>();
-        // Java 检测：注入注册表扫描器（WPF 层）作为额外候选来源。
-        services.AddSingleton(_ => new JavaDetector(JavaRegistryScanner.CollectCandidates()));
+        // Java 检测：注入注册表扫描器（WPF 层）作为额外候选来源，
+        // 并把启动器自己下载的 Java（<dataDir>/java）加入扫描范围。
+        services.AddSingleton(sp =>
+        {
+            var configService = sp.GetRequiredService<ConfigService>();
+            var detector = new JavaDetector(JavaRegistryScanner.CollectCandidates())
+            {
+                ManagedRuntimeRoots = [System.IO.Path.Combine(configService.DataDirectory, "java")]
+            };
+            return detector;
+        });
+        // Java 运行时下载：官方 Adoptium → 清华镜像，装到 <dataDir>/java 下。
+        services.AddSingleton<IJavaRuntimeService>(sp => new JavaRuntimeService(sp.GetRequiredService<HttpClient>()));
         services.AddSingleton<LaunchService>();
         // 模组服务：独立客户端（UA 由自身按配置逐请求设置），镜像开关与 UA 实时读取配置。
         services.AddSingleton(sp => new ModService(

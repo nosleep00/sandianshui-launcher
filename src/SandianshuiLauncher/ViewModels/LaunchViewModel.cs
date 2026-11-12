@@ -24,6 +24,7 @@ public partial class LaunchViewModel : ObservableObject
     private readonly ConfigService _config;
     private readonly GameInstaller _gameInstaller;
     private readonly JavaDetector _javaDetector;
+    private readonly IJavaRuntimeService _javaRuntime;
     private readonly LaunchService _launchService;
     private readonly AuthlibInjectorService _authlib;
     private readonly LauncherLogger _logger;
@@ -78,6 +79,7 @@ public partial class LaunchViewModel : ObservableObject
         ConfigService config,
         GameInstaller gameInstaller,
         JavaDetector javaDetector,
+        IJavaRuntimeService javaRuntime,
         LaunchService launchService,
         AuthlibInjectorService authlib,
         LauncherLogger logger,
@@ -88,6 +90,7 @@ public partial class LaunchViewModel : ObservableObject
         _config = config;
         _gameInstaller = gameInstaller;
         _javaDetector = javaDetector;
+        _javaRuntime = javaRuntime;
         _launchService = launchService;
         _authlib = authlib;
         _logger = logger;
@@ -209,9 +212,9 @@ public partial class LaunchViewModel : ObservableObject
             LaunchProgress = 35;
 
             int requiredJava = merged.JavaVersion?.MajorVersion ?? 8;
-            // 无论是否手动指定，都结合本机已安装的 Java 选出最匹配该版本的运行时。
-            JavaInfo javaInfo = await Task.Run(
-                () => _javaDetector.Resolve(settings.JavaPath, requiredJava, config.GameDirectory));
+            // 无论是否手动指定，都结合本机已安装的 Java 选出最匹配该版本的运行时；
+            // 本机确实没有时，询问用户是否让启动器自动下载一个（仿 PCL2）。
+            JavaInfo javaInfo = await ResolveJavaAsync(settings.JavaPath, requiredJava);
             string javaPath = javaInfo.Path;
 
             // 外置登录需要 authlib-injector javaagent：本地缺失时自动下载到启动器数据目录。
@@ -293,6 +296,49 @@ public partial class LaunchViewModel : ObservableObject
         {
             IsLaunching = false;
         }
+    }
+
+    /// <summary>
+    /// 解析本次启动要用的 Java：先在本机（含启动器自己下载过的运行时）里挑最匹配的版本；
+    /// 一个都没有时询问用户是否自动下载，下载期间把进度同步到首页的进度条。
+    /// </summary>
+    private async Task<JavaInfo> ResolveJavaAsync(string? configuredPath, int requiredJava)
+    {
+        try
+        {
+            return await Task.Run(
+                () => _javaDetector.Resolve(configuredPath, requiredJava, _config.Config.GameDirectory));
+        }
+        catch (InvalidOperationException)
+        {
+            bool download = _dialogs.Confirm(
+                $"这台电脑上没有找到可用的 Java {requiredJava}。\n" +
+                $"是否让启动器自动下载一个？（约 40 MB，安装到启动器数据目录，之后可复用）",
+                "缺少 Java 运行时");
+            if (!download)
+            {
+                throw new InvalidOperationException(
+                    $"未找到任何可用的 Java（该版本需要 Java {requiredJava}）。\n" +
+                    "可以在“设置”页手动指定 java.exe 路径，或让它自动下载。");
+            }
+        }
+
+        StatusText = $"正在下载 Java {requiredJava}…";
+        LaunchProgress = 40;
+        var progress = new Progress<JavaRuntimeProgress>(p =>
+        {
+            StatusText = p.Message;
+            // 下载阶段占 40–70%，给后面的启动步骤留出进度空间。
+            LaunchProgress = 40 + (Math.Clamp(p.Percent, 0, 100) / 100 * 30);
+        });
+
+        JavaInfo info = await _javaRuntime.EnsureAsync(
+            requiredJava,
+            _config.DataDirectory,
+            progress,
+            status => StatusText = status);
+        AppendLog($"已自动安装 Java {info.MajorVersion}（{info.Version}）：{info.Path}");
+        return info;
     }
 
     /// <summary>追加启动器自身的提示行（带启动器时间戳，仅在 UI 线程调用）。</summary>

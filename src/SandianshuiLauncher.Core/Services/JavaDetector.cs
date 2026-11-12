@@ -18,6 +18,12 @@ public partial class JavaDetector
         _additionalCandidates = additionalCandidates;
     }
 
+    /// <summary>
+    /// 启动器自己下载的 Java 根目录（通常是 <c>{数据目录}/java</c>）。每次扫描时都会检查其中的 java.exe，
+    /// 因此用户一键下载 Java 之后无需重启启动器即可被识别。
+    /// </summary>
+    public IReadOnlyList<string> ManagedRuntimeRoots { get; set; } = [];
+
     /// <summary>扫描常见位置并返回全部可用 Java（按主版本号降序）。</summary>
     public List<JavaInfo> Detect(string? gameDirectory = null)
     {
@@ -34,6 +40,13 @@ public partial class JavaDetector
                 {
                     javaPaths.Add(candidate);
                 }
+            }
+        }
+        foreach (string root in ManagedRuntimeRoots)
+        {
+            foreach (string managed in JavaRuntimeService.EnumerateJavaExe(root))
+            {
+                javaPaths.Add(managed);
             }
         }
         if (!string.IsNullOrEmpty(gameDirectory))
@@ -127,7 +140,7 @@ public partial class JavaDetector
     /// <summary>
     /// 结合本机扫描结果与用户手动指定的路径，解析出最适合指定版本的 Java。
     /// </summary>
-    public JavaInfo Resolve(string? configuredPath, int requiredMajorVersion, string? gameDirectory)
+    public virtual JavaInfo Resolve(string? configuredPath, int requiredMajorVersion, string? gameDirectory)
     {
         List<JavaInfo> detected = Detect(gameDirectory);
 
